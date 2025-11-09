@@ -6,7 +6,7 @@ on:
       - 'v*'  # Only trigger on version tags like v1.0.1
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   test-and-publish:
@@ -27,6 +27,9 @@ jobs:
         run: ./gradlew test
 
       - name: Build project
+        run: ./gradlew build shadowJar
+
+      - name: Build project
         run: ./gradlew build
 
       - name: Publish to Maven Central
@@ -38,6 +41,11 @@ jobs:
           JRELEASER_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
           JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.GPG_PUBLIC_KEY }}
           JRELEASER_GPG_SECRET_KEY: ${{ secrets.GPG_SECRET_KEY }}
+
+      - name: Create GitHub Release
+        run: ./gradlew jreleaserRelease
+        env:
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload test results
         if: always()
