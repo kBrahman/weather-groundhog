@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "top.brahman.dev.weather"
-version = "1.0.12"
+version = "1.0.13"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_22
@@ -63,9 +63,12 @@ jreleaser {
     signing {
         active.set(org.jreleaser.model.Active.ALWAYS)
         armored.set(true)
-        passphrase.set(providers.environmentVariable("JRELEASER_GPG_PASSPHRASE").orNull)
-        publicKey.set(providers.environmentVariable("JRELEASER_GPG_PUBLIC_KEY").orNull)
-        secretKey.set(providers.environmentVariable("JRELEASER_GPG_SECRET_KEY").orNull)
+        passphrase.set(providers.environmentVariable("JRELEASER_GPG_PASSPHRASE")
+            .orElse(providers.gradleProperty("signing.password")))
+        publicKey.set(providers.environmentVariable("JRELEASER_GPG_PUBLIC_KEY")
+            .orElse(providers.provider { file("public.asc").takeIf { it.exists() }?.readText() }))
+        secretKey.set(providers.environmentVariable("JRELEASER_GPG_SECRET_KEY")
+            .orElse(providers.provider { file("secret.asc").takeIf { it.exists() }?.readText() }))
     }
 
     deploy {
@@ -75,8 +78,10 @@ jreleaser {
                     active.set(org.jreleaser.model.Active.ALWAYS)
                     url.set("https://central.sonatype.com/api/v1/publisher")
                     stagingRepository("build/staging-deploy")
-                    username.set(providers.environmentVariable("JRELEASER_NEXUS_USERNAME").orNull)
-                    password.set(providers.environmentVariable("JRELEASER_NEXUS_PASSWORD").orNull)
+                    username.set(providers.environmentVariable("JRELEASER_MAVENCENTRAL_SONATYPE_USERNAME")
+                        .orElse(providers.gradleProperty("ossrhUsername")))
+                    password.set(providers.environmentVariable("JRELEASER_MAVENCENTRAL_SONATYPE_PASSWORD")
+                        .orElse(providers.gradleProperty("ossrhPassword")))
                 }
             }
         }
