@@ -1,9 +1,9 @@
-package top.brahman.grndhog.weather;
+package top.brahman.dev.weather;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import top.brahman.grndhog.weather.entity.CityWeather;
+import top.brahman.dev.weather.entity.CityWeather;
 
-import static top.brahman.grndhog.weather.util.Util.mapper;
+import static top.brahman.dev.weather.util.Util.mapper;
 
 public class TestUtil {
 
@@ -34,17 +34,4 @@ public class TestUtil {
               "name": "Zocca"
             }
             """;
-
-    public static CityWeather withName(CityWeather original, String newName) {
-        return new CityWeather(
-                original.weather(),
-                original.temperature(),
-                original.visibility(),
-                original.wind(),
-                original.datetime(),
-                original.sys(),
-                original.timezone(),
-                newName
-        );
-    }
 }

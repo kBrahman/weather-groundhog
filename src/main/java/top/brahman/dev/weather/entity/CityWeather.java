@@ -1,9 +1,10 @@
-package top.brahman.grndhog.weather.entity;
+package top.brahman.dev.weather.entity;
 
-import static top.brahman.grndhog.weather.util.Util.CACHE_TTL_SEC;
-import static top.brahman.grndhog.weather.util.Util.mapper;
+import static top.brahman.dev.weather.util.Util.CACHE_TTL_SEC;
+import static top.brahman.dev.weather.util.Util.mapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import top.brahman.dev.weather.util.Util;
 
 import java.beans.Transient;
 import java.time.Instant;
@@ -15,7 +16,7 @@ import java.time.Instant;
  * JSON serialization.
  * </p>
  *
- * <h3>Fields</h3>
+ * <h2>Fields</h2>
  * <ul>
  *   <li>{@link  Weather} — a nested record type carrying {@link  Weather#main} and {@link Weather#description} (e.g., "Clouds", "scattered clouds").</li>
  *   <li>{@link  Temperature} — nested record with {@link  Temperature#temp} and {@link  Temperature#feels_like} values.</li>
@@ -30,7 +31,7 @@ import java.time.Instant;
  * <h3>Cache TTL / Expiry</h3>
  * <p>
  * The method {@link #isExpired()} returns whether the data is older than the defined
- * cache-time-to-live (TTL) constant {@link top.brahman.grndhog.weather.util.Util#CACHE_TTL_SEC} relative to {@code datetime}.
+ * cache-time-to-live (TTL) constant {@link Util#CACHE_TTL_SEC} relative to {@code datetime}.
  * </p>
  *
  * <h3>JSON Serialization</h3>
@@ -62,7 +63,7 @@ import java.time.Instant;
  * Although clients of the SDK normally work with this object directly (rather than raw JSON),
  * this method allows retrieval of the JSON string when needed.
  * <p>
- * Note: If JSON serialization fails internally (via Jackson's {@link  top.brahman.grndhog.weather.util.Util#mapper}),
+ * Note: If JSON serialization fails internally (via Jackson's {@link  Util#mapper}),
  * the method catches {@link com.fasterxml.jackson.core.JsonProcessingException} and returns
  * a fallback string of the form {@code "{error: <message>}"}.
  * </p>

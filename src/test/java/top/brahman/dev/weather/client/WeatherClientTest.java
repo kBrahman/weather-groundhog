@@ -1,9 +1,10 @@
-package top.brahman.grndhog.weather.client;
+package top.brahman.dev.weather.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
 import org.awaitility.Awaitility;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,25 +15,26 @@ import retrofit2.Converter;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import top.brahman.grndhog.weather.CityWeatherBuilder;
-import top.brahman.grndhog.weather.TestUtil;
-import top.brahman.grndhog.weather.exception.CityNotFoundException;
-import top.brahman.grndhog.weather.exception.WeatherClientException;
-import top.brahman.grndhog.weather.model.APIError;
-import top.brahman.grndhog.weather.entity.CityWeather;
+import top.brahman.dev.weather.CityWeatherBuilder;
+import top.brahman.dev.weather.TestUtil;
+import top.brahman.dev.weather.exception.CityNotFoundException;
+import top.brahman.dev.weather.exception.WeatherClientException;
+import top.brahman.dev.weather.model.APIError;
+import top.brahman.dev.weather.entity.CityWeather;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Random;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-import static top.brahman.grndhog.weather.util.Util.CACHE_CAPACITY;
-import static top.brahman.grndhog.weather.util.Util.CACHE_TTL_SEC;
-import static top.brahman.grndhog.weather.util.Util.URL;
+import static top.brahman.dev.weather.util.Util.CACHE_CAPACITY;
+import static top.brahman.dev.weather.util.Util.CACHE_TTL_SEC;
+import static top.brahman.dev.weather.util.Util.URL;
 
 @ExtendWith(MockitoExtension.class)
 public class WeatherClientTest {
@@ -57,26 +59,37 @@ public class WeatherClientTest {
         Retrofit retrofit = new Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create()).baseUrl(URL).build();
         Converter<ResponseBody, APIError> converter = retrofit.responseBodyConverter(APIError.class, new Annotation[0]);
-        client = new WeatherClient(api, converter);
+        String apiKey = UUID.randomUUID().toString();
+        client = new WeatherClient(apiKey, api, converter);
+    }
+
+    @AfterEach
+    void closeClient() {
+        client.close();
     }
 
     @Test
     void builder_throw_whenApiKeyIsNull() {
-        assertThrows(IllegalArgumentException.class, () -> WeatherClient.builder().build());
+        assertThrows(IllegalArgumentException.class, () -> {
+            try (var _ = WeatherClient.builder().build()) {}
+        });
     }
 
     @Test
     void builder_throw_whenMultipleInstancesWithSameApiKey() {
         final String key = "test_1";
-        WeatherClient.builder().apiKey(key).build();
-        assertThrows(IllegalArgumentException.class, () -> WeatherClient.builder().apiKey(key).build());
+        final WeatherClient c = WeatherClient.builder().apiKey(key).build();
+        assertThrows(IllegalArgumentException.class, () -> {
+            try (var _ = WeatherClient.builder().apiKey(key).build()) {}
+        });
+        c.close();
     }
 
     @Test
-    void deleteApiKey() {
+    void closeAndResueSameApiKey() {
         final String key = "test_2";
-        WeatherClient.builder().apiKey(key).build();
-        WeatherClient.builder().apiKey(key).build();
+        try (var _ = WeatherClient.builder().apiKey(key).build()) {}
+        try (var _ = WeatherClient.builder().apiKey(key).build()) {}
     }
 
     @Test
@@ -168,5 +181,13 @@ public class WeatherClientTest {
             final CityWeather curr = client.getWeatherFor("Zocca");
             assertNotEquals(exp, curr);
         });
+    }
+
+    @Test
+    void neverThrow_wenNotClosed() throws Exception {
+        client.setMode(WeatherClient.ClientMode.POLLING);
+        when(api.get(any(), eq("Zocca"))).thenReturn(mockCall);
+        when(mockCall.execute()).thenReturn(Response.success(zoccaTestEntity));
+        client.getWeatherFor("Zocca");
     }
 }

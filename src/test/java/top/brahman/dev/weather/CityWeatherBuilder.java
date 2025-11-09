@@ -1,7 +1,7 @@
-package top.brahman.grndhog.weather;
+package top.brahman.dev.weather;
 
 
-import top.brahman.grndhog.weather.entity.CityWeather;
+import top.brahman.dev.weather.entity.CityWeather;
 
 /**
  * Test-only builder for {@link CityWeather}.

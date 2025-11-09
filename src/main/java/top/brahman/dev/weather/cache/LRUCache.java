@@ -1,25 +1,27 @@
-package top.brahman.grndhog.weather.cache;
+package top.brahman.dev.weather.cache;
+
+import top.brahman.dev.weather.util.Util;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static top.brahman.grndhog.weather.util.Util.CACHE_CAPACITY;
+import static top.brahman.dev.weather.util.Util.CACHE_CAPACITY;
 /**
  * A thread-safe implementation of an LRU (Least Recently Used) cache.
  * <p>
  * This cache automatically removes the least recently accessed entry
- * once the number of elements exceeds the defined capacity {@link top.brahman.grndhog.weather.util.Util#CACHE_CAPACITY}.
+ * once the number of elements exceeds the defined capacity {@link Util#CACHE_CAPACITY}.
  * It is backed by a {@link LinkedHashMap} configured for access order,
  * meaning that every {@link #get} or {@link  #put} operation updates
  * the order of entries.
  * </p>
  *
- * <h3>Usage in the Weather SDK</h3>
+ * <h2>Usage in the Weather SDK</h2>
  * <ul>
  *   <li>Used to store recent weather information for requested cities.</li>
  *   <li>Helps prevent unnecessary API calls if data is still valid.</li>
- *   <li>Ensures the SDK stores no more than {@value top.brahman.grndhog.weather.util.Util#CACHE_CAPACITY} cities at a time.</li>
+ *   <li>Ensures the SDK stores no more than {@value Util#CACHE_CAPACITY} cities at a time.</li>
  * </ul>
  *
  * <h3>Thread Safety</h3>

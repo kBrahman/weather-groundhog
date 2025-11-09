@@ -1,4 +1,4 @@
-package top.brahman.grndhog.weather.client;
+package top.brahman.dev.weather.client;
 
 import com.google.gson.GsonBuilder;
 import okhttp3.ResponseBody;
@@ -9,12 +9,13 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
-import top.brahman.grndhog.weather.cache.LRUCache;
-import top.brahman.grndhog.weather.exception.CityNotFoundException;
-import top.brahman.grndhog.weather.exception.WeatherClientException;
-import top.brahman.grndhog.weather.model.APIError;
-import top.brahman.grndhog.weather.entity.CityWeather;
-import top.brahman.grndhog.weather.util.CityWeatherDeserializer;
+import top.brahman.dev.weather.cache.LRUCache;
+import top.brahman.dev.weather.exception.CityNotFoundException;
+import top.brahman.dev.weather.exception.WeatherClientException;
+import top.brahman.dev.weather.model.APIError;
+import top.brahman.dev.weather.entity.CityWeather;
+import top.brahman.dev.weather.util.Util;
+import top.brahman.dev.weather.util.CityWeatherDeserializer;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -27,8 +28,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static top.brahman.grndhog.weather.util.Util.CACHE_TTL_SEC;
-import static top.brahman.grndhog.weather.util.Util.URL;
+import static top.brahman.dev.weather.util.Util.CACHE_TTL_SEC;
+import static top.brahman.dev.weather.util.Util.URL;
 
 /**
  * The main entry point for weather data retrieval from <a href="https://api.openweathermap.org/data/2.5/weather">https://api.openweathermap.org/data/2.5/weather</a>
@@ -43,7 +44,7 @@ import static top.brahman.grndhog.weather.util.Util.URL;
  * <h2>Key Features</h2>
  * <ul>
  *   <li>✅ <b>Thread-safe</b> — Safe for concurrent use across multiple threads</li>
- *   <li>✅ <b>Automatic caching</b> — LRU cache with TTL-based expiration ({@link top.brahman.grndhog.weather.util.Util#CACHE_TTL_SEC}  seconds)</li>
+ *   <li>✅ <b>Automatic caching</b> — LRU cache with TTL-based expiration ({@link Util#CACHE_TTL_SEC}  seconds)</li>
  *   <li>✅ <b>Background updates</b> — In {@code POLLING} mode, refreshes data when it expires</li>
  *   <li>✅ <b>API key safety</b> — Prevents accidental reuse of API keys across instances</li>
  *   <li>✅ <b>Graceful error handling</b> — Translates HTTP errors to meaningful exceptions</li>
@@ -108,8 +109,9 @@ public final class WeatherClient implements AutoCloseable {
     /**
      * Test constructor
      */
-    WeatherClient(WeatherApi api, Converter<ResponseBody, APIError> converter) {
-        this(null, ClientMode.ON_DEMAND, api, converter);
+    WeatherClient(String key, WeatherApi api, Converter<ResponseBody, APIError> converter) {
+        this(key, ClientMode.ON_DEMAND, api, converter);
+        usedApiKeys.add(key);
     }
 
     /**
@@ -128,7 +130,7 @@ public final class WeatherClient implements AutoCloseable {
     }
 
     private boolean isClosed() {
-        return usedApiKeys.contains(apiKey);
+        return !usedApiKeys.contains(apiKey);
     }
 
     /**
@@ -146,20 +148,21 @@ public final class WeatherClient implements AutoCloseable {
      *
      * <p><b>Behavior by mode:</b></p>
      * <ul>
-     *   <li><b>{@code ON_DEMAND}</b>: Returns cached data if fresh (within {@value top.brahman.grndhog.weather.util.Util#CACHE_TTL_SEC}  seconds),
+     *   <li><b>{@code ON_DEMAND}</b>: Returns cached data if fresh (within {@value Util#CACHE_TTL_SEC}  seconds),
      *       otherwise fetches from API</li>
      *   <li><b>{@code POLLING}</b>: Returns cached data immediately if it is in cache. If not, fetches from API, caches it
-     *   and schedules a background periodic refresh</li>
+     *   and schedules a background periodic refresh. In this mode, data may get expired for a short period of time. For that reason we need condition
+     *   {@code (mode == ClientMode.POLLING || !weather.isExpired())}</li>
      * </ul>
      *
-     * <h3>Error Handling</h3>
+     * <h4>Error Handling</h4>
      * <ul>
      *   <li>{@link CityNotFoundException} — When city name is invalid (HTTP 404)</li>
      *   <li>{@link WeatherClientException} — For network issues or API errors</li>
      *   <li>{@link RuntimeException} — For unexpected conditions (e.g., null responses)</li>
      * </ul>
      *
-     * <h3>Thread Safety</h3>
+     * <h4>Thread Safety</h4>
      * <p>Safe for concurrent calls from multiple threads.</p>
      *
      * @param city the city name (e.g., "London", "New York") — case-insensitive
@@ -173,6 +176,7 @@ public final class WeatherClient implements AutoCloseable {
         if (weather != null && (mode == ClientMode.POLLING || !weather.isExpired())) return weather;
         try {
             final CityWeather cityWeather = getFromCloud(city);
+            if (cityWeather == null) throw new IOException("Got null result. Probably problem with deserialization");
             cache.put(city, cityWeather);
             if (mode == ClientMode.POLLING) scheduleUpdate(cityWeather);
             return cityWeather;
@@ -261,7 +265,7 @@ public final class WeatherClient implements AutoCloseable {
          * For long-running apps, retain a single instance and {@code close} it down when your app terminates.</p>
          *
          * @return a fully initialized, thread-safe WeatherClient
-         * @throws IllegalArgumentException if API key is missing or already in use
+         * @throws IllegalArgumentException if an API key is missing or already in use
          */
         public WeatherClient build() {
             if (key == null || key.trim().isEmpty()) throw new IllegalArgumentException("API key must be provided");
@@ -312,7 +316,7 @@ public final class WeatherClient implements AutoCloseable {
         ON_DEMAND,
 
         /**
-         * Caches data and auto-updates in background to keep it fresh.
+         * Caches data and auto-updates in the background to keep it fresh.
          */
         POLLING
     }
