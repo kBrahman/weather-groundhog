@@ -3,32 +3,29 @@ plugins {
     `maven-publish`
     signing
     id("com.gradleup.shadow") version "9.2.2"
+    id("org.jreleaser") version "1.21.0"
 }
 
 group = "top.brahman.dev.weather"
-version = "1.0.0"
-tasks {
-    named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
-        archiveClassifier.set("all")
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        // optional: relocate packages or merge service files if needed
-//        mergeServiceFiles()
-    }
+version = "1.0.1"
 
-    // Make the build task depend on shadowJar if you want the fat JAR produced automatically
-//    build {
-//        dependsOn(named("shadowJar"))
-//    }
+java {
+    sourceCompatibility = JavaVersion.VERSION_16
+    targetCompatibility = JavaVersion.VERSION_16
+    withSourcesJar()
+    withJavadocJar()
 }
+
 publishing {
     publications {
         create<MavenPublication>("maven") {
             artifactId = project.name
             from(components["java"])
+
             pom {
                 name.set("Weather Groundhog")
                 description.set("OpenWeather SDK")
-                url.set("https://github.com/yourusername/yourrepo")
+                url.set("https://github.com/kBrahman/weather-groundhog.git")
 
                 licenses {
                     license {
@@ -39,42 +36,64 @@ publishing {
 
                 developers {
                     developer {
-                        id.set("yourid")
+                        id.set("kBrahman")
                         name.set("Kairat Kaibrakhman")
                         email.set("brahman.dev.kz@gmail.com")
                     }
                 }
 
                 scm {
-                    connection.set("scm:git:git://github.com/yourusername/yourrepo.git")
-                    developerConnection.set("scm:git:ssh://github.com/yourusername/yourrepo.git")
-                    url.set("https://github.com/yourusername/yourrepo")
+                    connection.set("scm:git:git://github.com/kBrahman/weather-groundhog.git")
+                    developerConnection.set("scm:git:ssh://github.com/kBrahman/weather-groundhog.git")
+                    url.set("https://github.com/kBrahman/weather-groundhog.git")
                 }
             }
         }
     }
+
     repositories {
         maven {
-            name = "OSSRH"
-            val releasesRepoUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-            val snapshotsRepoUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-            url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
+            name = "staging"
+            url = uri("build/staging-deploy")
+        }
+    }
+}
 
-            credentials {
-                username = project.findProperty("ossrhUsername") as String? ?: System.getenv("OSSRH_USERNAME")
-                password = project.findProperty("ossrhPassword") as String? ?: System.getenv("OSSRH_PASSWORD")
+jreleaser {
+    signing {
+        active.set(org.jreleaser.model.Active.ALWAYS)
+        armored.set(true)
+        passphrase.set(providers.gradleProperty("signing.password"))
+        publicKey.set(file("public.asc").readText())
+        secretKey.set(file("secret.asc").readText())
+    }
+
+    deploy {
+        maven {
+            mavenCentral {
+                create("sonatype") {
+                    active.set(org.jreleaser.model.Active.ALWAYS)
+                    url.set("https://central.sonatype.com/api/v1/publisher")
+                    stagingRepository("build/staging-deploy")
+                    username.set(providers.gradleProperty("ossrhUsername"))
+                    password.set(providers.gradleProperty("ossrhPassword"))
+                }
             }
         }
     }
-
 }
+
+tasks {
+    named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
+        archiveClassifier.set("all")
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+}
+
 signing {
     sign(publishing.publications["maven"])
 }
-java {
-    withSourcesJar()
-    withJavadocJar()
-}
+
 repositories {
     mavenCentral()
 }

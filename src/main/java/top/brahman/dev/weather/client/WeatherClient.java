@@ -171,7 +171,7 @@ public final class WeatherClient implements AutoCloseable {
      * @throws WeatherClientException   for network failures or API errors
      * @throws IllegalArgumentException if {@code city} is blank or null
      */
-    public CityWeather getWeatherFor(String city) throws Exception {
+    public CityWeather getWeatherFor(String city) throws WeatherClientException {
         final CityWeather weather = cache.get(city);
         if (weather != null && (mode == ClientMode.POLLING || !weather.isExpired())) return weather;
         try {
@@ -185,7 +185,7 @@ public final class WeatherClient implements AutoCloseable {
         }
     }
 
-    private CityWeather getFromCloud(String city) throws Exception {
+    private CityWeather getFromCloud(String city) throws IOException {
         final Response<CityWeather> response = api.get(apiKey, city).execute();
         if (!response.isSuccessful()) {
             final ResponseBody errorBody = response.errorBody();

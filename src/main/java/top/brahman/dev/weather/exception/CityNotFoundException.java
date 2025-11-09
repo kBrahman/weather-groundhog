@@ -27,7 +27,7 @@ import top.brahman.dev.weather.client.WeatherClient;
  *
  * @see WeatherClient#getWeatherFor(String)
  */
-public class CityNotFoundException extends Exception {
+public class CityNotFoundException extends RuntimeException {
     /**
      * Constructs a new CityNotFoundException for the specified city.
      *
