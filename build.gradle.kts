@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "top.brahman.dev.weather"
-version = "1.0.6"
+version = "1.0.7"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_22
@@ -90,9 +90,9 @@ tasks {
     }
 }
 
-signing {
-    sign(publishing.publications["maven"])
-}
+//signing {
+//    sign(publishing.publications["maven"])
+//}
 
 repositories {
     mavenCentral()
