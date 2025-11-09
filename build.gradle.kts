@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "top.brahman.dev.weather"
-version = "1.0.11"
+version = "1.0.12"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_22
@@ -81,24 +81,24 @@ jreleaser {
             }
         }
     }
-    release {
-        github {
-//            owner.set("kBrahman")
-//            name.set("weather-groundhog")
-            overwrite.set(true)
-            update {
-                enabled.set(true)
-            }
-        }
-    }
-
-    files {
-        artifacts {
-            artifact {
-                path.set(layout.buildDirectory.file("libs/weather-groundhog-*-all.jar"))
-            }
-        }
-    }
+//    release {
+//        github {
+////            owner.set("kBrahman")
+////            name.set("weather-groundhog")
+//            overwrite.set(true)
+//            update {
+//                enabled.set(true)
+//            }
+//        }
+//    }
+//
+//    files {
+//        artifacts {
+//            artifact {
+//                path.set(layout.buildDirectory.file("libs/weather-groundhog-*-all.jar"))
+//            }
+//        }
+//    }
 }
 
 tasks {
