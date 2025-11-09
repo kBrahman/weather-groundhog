@@ -7,11 +7,11 @@ plugins {
 }
 
 group = "top.brahman.dev.weather"
-version = "1.0.4"
+version = "1.0.5"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_16
-    targetCompatibility = JavaVersion.VERSION_16
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
     withSourcesJar()
     withJavadocJar()
 }
