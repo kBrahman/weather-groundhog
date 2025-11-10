@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "top.brahman.dev.weather"
-version = "1.0.19"
+version = "1.0.20"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_22
@@ -149,11 +149,10 @@ tasks.register("debugSecrets") {
         val publicKey = providers.environmentVariable("JRELEASER_GPG_PUBLIC_KEY").orNull
         val secretKey = providers.environmentVariable("JRELEASER_GPG_SECRET_KEY").orNull
         val passphrase = providers.environmentVariable("JRELEASER_GPG_PASSPHRASE").orNull
-        println("=== PUBLIC_KEY ===")
-        println(publicKey ?: "NULL")
-        println("\n=== SECRET_KEY ===")
-        println(secretKey ?: "NULL")
-        println("\n=== PASSPHRASE ===")
-        println(passphrase ?: "NULL")
+        println("PUBLIC_KEY: length=${publicKey?.length}, starts=${publicKey?.substring(0, minOf(30, publicKey.length))}, ends=${publicKey?.substring(maxOf(0, publicKey.length - 30))}")
+        println("SECRET_KEY: length=${secretKey?.length}, starts=${secretKey?.substring(0, minOf(30, secretKey.length))}, ends=${secretKey?.substring(maxOf(0, secretKey.length - 30))}")
+        println("PASSPHRASE: length=${passphrase?.length}")
+        println("PUBLIC_KEY lines: ${publicKey?.split("\n")?.size}")
+        println("SECRET_KEY lines: ${secretKey?.split("\n")?.size}")
     }
 }
