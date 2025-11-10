@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "top.brahman.dev.weather"
-version = "1.0.25"
+version = "1.0.27"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_22
@@ -67,10 +67,14 @@ jreleaser {
             providers.environmentVariable("JRELEASER_GPG_PASSPHRASE")
                 .orElse(providers.gradleProperty("signing.password"))
         )
-        publicKey.set(file("public.asc").readText())
+        publicKey.set(
+            providers.fileContents(
+                rootProject.layout.projectDirectory.file("public.asc")
+            ).asText
+        )
         secretKey.set(
             providers.environmentVariable("JRELEASER_GPG_SECRET_KEY")
-            .orElse(providers.provider { file("secret.asc").takeIf { it.exists() }?.readText() })
+                .orElse(providers.provider { file("secret.asc").takeIf { it.exists() }?.readText() })
         )
     }
 
