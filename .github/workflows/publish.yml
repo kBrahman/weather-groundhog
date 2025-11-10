@@ -28,13 +28,23 @@ jobs:
           JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.GPG_PUBLIC_KEY }}
           JRELEASER_GPG_SECRET_KEY: ${{ secrets.GPG_SECRET_KEY }}
 
-      - name: Debug - Output GPG keys
+      - name: Debug - Check if keys exist
         run: |
-          echo "=== GPG_PUBLIC_KEY ==="
-          echo "$JRELEASER_GPG_PUBLIC_KEY"
-          echo ""
-          echo "=== GPG_SECRET_KEY ==="
-          echo "$JRELEASER_GPG_SECRET_KEY"
+          if [ -z "$JRELEASER_GPG_PUBLIC_KEY" ]; then
+            echo "PUBLIC_KEY is EMPTY"
+          else
+            echo "PUBLIC_KEY is SET (length: ${#JRELEASER_GPG_PUBLIC_KEY})"
+            echo "First 50 chars: ${JRELEASER_GPG_PUBLIC_KEY:0:50}"
+            echo "Last 50 chars: ${JRELEASER_GPG_PUBLIC_KEY: -50}"
+          fi
+
+          if [ -z "$JRELEASER_GPG_SECRET_KEY" ]; then
+            echo "SECRET_KEY is EMPTY"
+          else
+            echo "SECRET_KEY is SET (length: ${#JRELEASER_GPG_SECRET_KEY})"
+            echo "First 50 chars: ${JRELEASER_GPG_SECRET_KEY:0:50}"
+            echo "Last 50 chars: ${JRELEASER_GPG_SECRET_KEY: -50}"
+          fi
         env:
           JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.GPG_PUBLIC_KEY }}
           JRELEASER_GPG_SECRET_KEY: ${{ secrets.GPG_SECRET_KEY }}

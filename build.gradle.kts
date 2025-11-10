@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "top.brahman.dev.weather"
-version = "1.0.17"
+version = "1.0.18"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_22
@@ -63,20 +63,9 @@ jreleaser {
     signing {
         active.set(org.jreleaser.model.Active.ALWAYS)
         armored.set(true)
-        passphrase.set(
-            providers.environmentVariable("JRELEASER_GPG_PASSPHRASE")
-            .map { it.trim() }
-            .orElse(providers.gradleProperty("signing.password")))
-        publicKey.set(
-            providers.environmentVariable("JRELEASER_GPG_PUBLIC_KEY")
-            .map { it.trim() }
-            .orElse(providers.provider { file("public.asc").takeIf { it.exists() }?.readText() })
-        )
-        secretKey.set(
-            providers.environmentVariable("JRELEASER_GPG_SECRET_KEY")
-            .map { it.trim() }
-            .orElse(providers.provider { file("secret.asc").takeIf { it.exists() }?.readText() })
-        )
+        passphrase.set(providers.environmentVariable("JRELEASER_GPG_PASSPHRASE").map { it.trim() })
+        publicKey.set(providers.environmentVariable("JRELEASER_GPG_PUBLIC_KEY").map { it.trim() })
+        secretKey.set(providers.environmentVariable("JRELEASER_GPG_SECRET_KEY").map { it.trim() })
     }
 
     deploy {
