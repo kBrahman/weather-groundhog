@@ -3,11 +3,11 @@ plugins {
     `maven-publish`
     signing
     id("com.gradleup.shadow") version "9.2.2"
-    id("org.jreleaser") version "1.21.0"
+    id("org.jreleaser") version "1.20.0"
 }
 
 group = "top.brahman.dev.weather"
-version = "1.0.28"
+version = "1.0.30"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_22
@@ -99,6 +99,7 @@ jreleaser {
     }
     release {
         github {
+//            active.set(org.jreleaser.model.Active.RELEASE)  // Add this line
             overwrite.set(true)
             update {
                 enabled.set(true)
