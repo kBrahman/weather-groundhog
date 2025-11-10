@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "top.brahman.dev.weather"
-version = "1.0.27"
+version = "1.0.28"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_22
@@ -97,24 +97,22 @@ jreleaser {
             }
         }
     }
-//    release {
-//        github {
-////            owner.set("kBrahman")
-////            name.set("weather-groundhog")
-//            overwrite.set(true)
-//            update {
-//                enabled.set(true)
-//            }
-//        }
-//    }
-//
-//    files {
-//        artifacts {
-//            artifact {
-//                path.set(layout.buildDirectory.file("libs/weather-groundhog-*-all.jar"))
-//            }
-//        }
-//    }
+    release {
+        github {
+            overwrite.set(true)
+            update {
+                enabled.set(true)
+            }
+        }
+    }
+
+    files {
+        artifacts {
+            artifact {
+                path.set(layout.buildDirectory.file("libs/weather-groundhog-*-all.jar"))
+            }
+        }
+    }
 }
 
 tasks {
@@ -123,10 +121,6 @@ tasks {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
 }
-
-//signing {
-//    sign(publishing.publications["maven"])
-//}
 
 repositories {
     mavenCentral()
@@ -151,36 +145,5 @@ tasks.test {
         showExceptions = true
         showStandardStreams = true
         events("passed", "skipped", "failed")
-    }
-}
-
-tasks.register("debugSecrets") {
-    doLast {
-        val publicKey = providers.environmentVariable("JRELEASER_GPG_PUBLIC_KEY").orNull
-        val secretKey = providers.environmentVariable("JRELEASER_GPG_SECRET_KEY").orNull
-        val passphrase = providers.environmentVariable("JRELEASER_GPG_PASSPHRASE").orNull
-        println(
-            "PUBLIC_KEY: length=${publicKey?.length}, starts=${publicKey?.substring(0, minOf(30, publicKey.length))}, ends=${
-                publicKey?.substring(
-                    maxOf(
-                        0,
-                        publicKey.length - 30
-                    )
-                )
-            }"
-        )
-        println(
-            "SECRET_KEY: length=${secretKey?.length}, starts=${secretKey?.substring(0, minOf(30, secretKey.length))}, ends=${
-                secretKey?.substring(
-                    maxOf(
-                        0,
-                        secretKey.length - 30
-                    )
-                )
-            }"
-        )
-        println("PASSPHRASE: length=${passphrase?.length}")
-        println("PUBLIC_KEY lines: ${publicKey?.split("\n")?.size}")
-        println("SECRET_KEY lines: ${secretKey?.split("\n")?.size}")
     }
 }
