@@ -3,7 +3,7 @@ plugins {
     `maven-publish`
     signing
     id("com.gradleup.shadow") version "9.2.2"
-    id("org.jreleaser") version "1.20.0"
+    id("org.jreleaser") version "1.21.0"
 }
 
 group = "top.brahman.dev.weather"
@@ -97,23 +97,22 @@ jreleaser {
             }
         }
     }
-    release {
-        github {
-//            active.set(org.jreleaser.model.Active.RELEASE)  // Add this line
-            overwrite.set(true)
-            update {
-                enabled.set(true)
-            }
-        }
-    }
-
-    files {
-        artifacts {
-            artifact {
-                path.set(layout.buildDirectory.file("libs/weather-groundhog-*-all.jar"))
-            }
-        }
-    }
+//    release {
+//        github {
+//            overwrite.set(true)
+//            update {
+//                enabled.set(true)
+//            }
+//        }
+//    }
+//
+//    files {
+//        artifacts {
+//            artifact {
+//                path.set(layout.buildDirectory.file("libs/weather-groundhog-*-all.jar"))
+//            }
+//        }
+//    }
 }
 
 tasks {
