@@ -40,7 +40,7 @@ Add Weather-Groundhog to your project using your preferred build tool:
 #### Gradle
 
 ```gradle
-implementation("top.brahman.dev.weather:weather-groundhog:1.0.0")
+implementation("top.brahman.dev.weather:weather-groundhog:1.1.0")
 ```
 
 #### Maven
@@ -49,7 +49,7 @@ implementation("top.brahman.dev.weather:weather-groundhog:1.0.0")
 <dependency>
     <groupId>top.brahman.dev.weather</groupId>
     <artifactId>weather-groundhog</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
@@ -58,14 +58,14 @@ implementation("top.brahman.dev.weather:weather-groundhog:1.0.0")
 Download the fat JAR from the [latest release](https://github.com/kBrahman/weather-groundhog/releases):
 
 1. Go to the [Releases page](https://github.com/kBrahman/weather-groundhog/releases)
-2. Download `weather-groundhog-1.0.0-all.jar` (or the latest version)
+2. Download `weather-groundhog-1.1.0-all.jar` (or the latest version)
 3. Add it to your project's classpath or `libs/` directory
 
 #### Using with Gradle
 
 ```gradle
 dependencies {
-    implementation(files("libs/weather-groundhog-1.0.0-all.jar"))
+    implementation(files("libs/weather-groundhog-1.1.0-all.jar"))
 }
 ```
 
@@ -75,9 +75,9 @@ dependencies {
 <dependency>
     <groupId>top.brahman.dev.weather</groupId>
     <artifactId>weather-groundhog</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <scope>system</scope>
-    <systemPath>${project.basedir}/libs/weather-groundhog-1.0.0-all.jar</systemPath>
+    <systemPath>${project.basedir}/libs/weather-groundhog-1.1.0-all.jar</systemPath>
 </dependency>
 ```
 
@@ -114,7 +114,7 @@ Then reference it in your dependencies:
 <dependency>
     <groupId>top.brahman.dev.weather</groupId>
     <artifactId>weather-groundhog</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
